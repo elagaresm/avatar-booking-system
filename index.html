@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistema de reservas</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--g:#97B426;--ink:#15180e;--mut:#76796d;--line:#E8E7E0;--soft:#F7F7F3;--err:#b3412f;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px);background:#fff}
+body{margin:0;background:#fff;color:var(--ink);font:400 15px/1.55 'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h2,h3{font-weight:300;letter-spacing:-.03em;margin:0}button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px clamp(16px,4vw,40px)}.hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:500}
+.seg{display:inline-flex;background:var(--soft);border-radius:99px;padding:3px}.seg button{border:0;background:none;padding:7px 15px;border-radius:99px;font-size:13px;color:var(--mut);transition:background .3s,color .3s}.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 0 0 1px var(--line),0 2px 6px -2px rgba(21,24,14,.15)}
+.stage{max-width:600px;margin:0 auto;padding:4px clamp(18px,4vw,24px) 24px;text-align:center;display:flex;flex-direction:column;min-height:calc(100vh - 90px)}
+.steps{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}.steps i{height:4px;width:22px;border-radius:4px;background:var(--line);transition:width .5s,background .4s}.steps i.on{background:var(--g)}.steps i.cur{width:46px;background:var(--ink)}
+.nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-size:13px;color:var(--mut);min-height:30px}
+.back{justify-self:start;border:0;background:none;padding:6px 0;color:var(--ink);display:inline-flex;gap:8px;align-items:center}.back:before{content:'';width:12px;height:1px;background:currentColor;transition:width .3s}.back:hover:before{width:22px}
+.pill{align-self:center;display:inline-flex;gap:8px;align-items:center;padding:8px 16px;border-radius:99px;background:var(--soft);font-size:13px;color:var(--mut);margin-top:10px;flex-wrap:wrap;justify-content:center}.pill b{color:var(--ink);font-weight:500}
+.body{flex:1;padding:18px 0 24px}
+.body h2{font-size:clamp(34px,6vw,54px);line-height:1.05;letter-spacing:-.035em;margin:10px 0 12px}
+.lead{color:var(--mut);margin:0 auto 30px;max-width:44ch}
+.foot{position:sticky;bottom:0;padding:18px 0 max(14px,env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(255,255,255,0),#fff 28%)}
+.btn{width:100%;height:56px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:99px;font-weight:500;position:relative;overflow:hidden;isolation:isolate;transition:color .4s,border-color .4s}
+.btn:before{content:'';position:absolute;inset:0;background:var(--g);transform:translateY(101%);border-radius:50% 50% 0 0;transition:transform .55s cubic-bezier(.7,0,.2,1),border-radius .55s;z-index:-1}
+.btn:hover:not(:disabled){color:var(--ink);border-color:var(--g)}.btn:hover:not(:disabled):before{transform:none;border-radius:0}
+.btn:disabled{background:#fff;color:#b3b5aa;border-color:var(--line);cursor:not-allowed}.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line);margin-top:8px}
+.opt{display:flex;gap:18px;align-items:center;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 52px 20px 20px;margin-bottom:12px;position:relative;transition:transform .35s,box-shadow .35s,border-color .35s}
+.opt:hover{transform:translateY(-3px);box-shadow:0 18px 40px -24px rgba(21,24,14,.4)}.opt[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.opt:after{content:'';position:absolute;right:20px;top:22px;width:14px;height:14px;border-radius:50%;border:1px solid #cfcfc6;transition:.3s}.opt[aria-pressed=true]:after{background:var(--g);border-color:var(--g);box-shadow:0 0 0 4px color-mix(in srgb,var(--g) 22%,transparent)}
+.opt h3{font-size:24px}.opt .tx{flex:1;min-width:0}.opt .tx>div{color:var(--mut);margin-top:4px}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:14px}.cat{flex-direction:column;text-align:center;padding:36px 14px 30px;margin:0}.cat:after{display:none}.cat .tx{text-align:center}.cat .meta{justify-content:center}.cat .ic{width:68px;height:68px;flex:none}
+.ic{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px}.ic svg{width:100%;height:100%;overflow:visible}
+.ic .s{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}.ic .f{fill:var(--g)}
+.meta{display:flex;gap:16px;color:var(--mut);font-size:13px;margin-top:8px}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;margin-top:8px}.tag:before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g)}
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px;margin:0 auto 22px;width:fit-content;max-width:100%}
+.day{flex:0 0 64px;border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px 0;transition:.3s}.day b{display:block;font-size:24px;font-weight:300}.day span{font-size:12px;color:var(--mut)}
+.day:hover{border-color:var(--ink)}.day[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.day[aria-pressed=true] span{color:#cfd3c2}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{border:1px solid var(--line);background:#fff;border-radius:14px;padding:16px 0;font-size:17px;font-weight:300;transition:.3s}.slot:hover:not(:disabled){border-color:var(--ink)}.slot[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.slot:disabled{color:#c5c7bc;text-decoration:line-through;cursor:not-allowed}
+.fld{text-align:left}label{display:block;font-size:13px;color:var(--mut);margin:18px 0 6px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:border-color .3s,box-shadow .3s;resize:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--g) 25%,transparent)}
+.invalid{border-color:var(--err)}.errmsg{color:var(--err);font-size:13px;margin-top:6px}
+.chips,.filters{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--soft);border-radius:99px;padding:4px;max-width:100%;justify-content:center}.filters{margin-bottom:20px}
+.chip{border:0;background:none;padding:9px 16px;border-radius:99px;font-size:14px;color:var(--mut);transition:.3s}.chip:hover{color:var(--ink)}.chip[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 0 0 1px var(--line),0 2px 6px -2px rgba(21,24,14,.15)}
+.sum{margin:18px 0;border:1px solid var(--line);border-radius:22px;padding:4px 20px;text-align:left}.row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.row span:first-child{color:var(--mut)}.row span:last-child{text-align:right}.row.tot{font-size:24px;font-weight:300}.row.tot span:first-child{color:var(--ink)}
+.notice{margin:20px auto;background:var(--soft);border-radius:20px;padding:16px 20px;color:var(--mut);font-size:14px;max-width:52ch}.notice b{color:var(--ink);font-weight:500}
+details{border-bottom:1px solid var(--line);padding:14px 0;text-align:left}summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between}summary::-webkit-details-marker{display:none}summary::after{content:'+';font-weight:300;font-size:20px;line-height:1;transition:transform .3s}details[open] summary::after{transform:rotate(45deg)}details p{color:var(--mut);margin:10px 0 0;font-size:14px}
+.check{display:flex;gap:12px;align-items:flex-start;margin:22px 0 0;font-size:14px;color:var(--mut);text-align:left}.check input{width:18px;height:18px;margin-top:2px;accent-color:var(--ink);padding:0}
+.tl{display:inline-block;text-align:left;list-style:none;padding:0;margin:18px 0}.tl li{position:relative;padding:0 0 20px 28px;color:var(--mut);animation:up .7s both}.tl li:nth-child(2){animation-delay:.15s}.tl li:nth-child(3){animation-delay:.3s}.tl li:nth-child(4){animation-delay:.45s}.tl li:nth-child(5){animation-delay:.6s}
+.tl li:before{content:'';position:absolute;left:0;top:6px;width:9px;height:9px;border-radius:50%;border:1px solid var(--ink);background:#fff}.tl li:after{content:'';position:absolute;left:4px;top:19px;bottom:0;width:1px;background:var(--line)}.tl li:last-child:after{display:none}.tl li.done{color:var(--ink)}.tl li.done:before{background:var(--g);border-color:var(--g)}
+@keyframes up{from{opacity:0;transform:translateY(10px)}}
+.an .body>*{animation:up .7s cubic-bezier(.2,.8,.2,1) both}.an .body>*:nth-child(2){animation-delay:.06s}.an .body>*:nth-child(3){animation-delay:.12s}.an .body>*:nth-child(4){animation-delay:.18s}.an .body>*:nth-child(n+5){animation-delay:.24s}
+.ops{max-width:1120px;margin:0 auto;padding:12px clamp(16px,4vw,40px) 48px;display:grid;grid-template-columns:1.5fr 1fr;gap:20px}@media(max-width:900px){.ops{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:26px;padding:28px}.panel h2{font-size:clamp(28px,4vw,40px);margin-bottom:20px}
+.ops.an .panel{animation:up .7s cubic-bezier(.2,.8,.2,1) both}.ops.an .panel+.panel{animation-delay:.1s}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse}th{text-align:left;font-size:13px;color:var(--mut);font-weight:400;padding:10px 12px;border-bottom:1px solid var(--line)}td{padding:15px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.r{cursor:pointer;transition:background .25s}tr.r:hover,tr.r.sel{background:var(--soft)}
+.badge{display:inline-flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap}.badge:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--bd,#999)}
+.b-pending{--bd:#d6a82b}.b-pay{--bd:#d0603f}.b-conf{--bd:var(--g)}.b-rem{--bd:#4f9aa6}.b-done{--bd:#aaa}.b-res{--bd:#8a62b0}.b-can{--bd:#b3412f}
+.act{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.act button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:10px 16px;font-size:14px;transition:.25s}.act button:hover{border-color:var(--ink)}.act button.p{background:var(--ink);border-color:var(--ink);color:#fff}.act button.d{color:var(--err)}
+.empty{color:var(--mut);padding:24px 0}.audit{font-size:13px;color:var(--mut);margin:0;padding-left:18px}
+.flash{animation:flash 2s}@keyframes flash{from{background:color-mix(in srgb,var(--g) 25%,#fff)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wl-main{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:6vh 0 3vh}
+.wh{font-size:clamp(36px,9.5vw,92px);line-height:1;font-weight:300;letter-spacing:-.045em;margin:0 0 24px}.wh span{display:block;overflow:hidden;padding-bottom:.1em}
+.wh i{display:block;font-style:normal;transform:translateY(106%);animation:rise2 1.1s cubic-bezier(.2,.8,.2,1) forwards}.wh span:nth-child(2) i{animation-delay:.14s}@keyframes rise2{to{transform:none}}
+.wl .lead{margin-bottom:0;opacity:0;animation:up .8s .55s forwards}
+.proc{list-style:none;padding:0;margin:38px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;border-top:1px solid var(--line);position:relative}
+.proc:before{content:'';position:absolute;top:-1px;left:0;height:1px;width:100%;background:var(--g);transform:scaleX(0);transform-origin:left;animation:ln 1.4s .75s cubic-bezier(.6,0,.2,1) forwards}@keyframes ln{to{transform:none}}
+.proc li{padding:16px 6px 0;font-size:14px;color:var(--mut);opacity:0;animation:up .8s forwards}.proc li:nth-child(1){animation-delay:.95s}.proc li:nth-child(2){animation-delay:1.1s}.proc li:nth-child(3){animation-delay:1.25s}
+.proc b{display:block;font-weight:300;font-size:28px;color:var(--ink);margin-bottom:4px}
+@media (prefers-reduced-motion:reduce){.wh i{transform:none}.wl .lead,.proc li,.by{opacity:1}.proc:before{transform:none}}
+.fine{margin:12px 0 0;font-size:13px;color:var(--mut)}.proc li span{display:block}.proc li .pt{color:var(--ink);font-size:15px;margin-bottom:2px}
+@media(max-width:560px){.proc{grid-template-columns:1fr;gap:0}.proc li{display:grid;grid-template-columns:44px 1fr;text-align:left;padding:14px 0;border-bottom:1px solid var(--line)}.proc b{grid-row:span 2;margin:0}}
+.by{font-size:14px;letter-spacing:.01em;color:var(--mut);margin-bottom:30px;opacity:0;animation:up .8s .1s forwards}.by b{color:var(--ink);font-weight:500}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand" role="img" aria-label="Logo"><svg width="26" height="26" viewBox="425 195 435 430" aria-hidden="true"><path id="lg" fill="#97B426"/></svg></div>
+  <div class="hr"><div class="seg lang" role="group" aria-label="Idioma / Language"><button id="le">ES</button><button id="ln">EN</button></div><div class="seg views" role="group"><button id="vc"></button><button id="vi"></button></div></div>
+</header>
+<main id="app"></main>
+<script>
+const LOGO="M600 200H672L815 548C828 580 840 600 852 618H779L716 470L636 275C625 248 615 225 605 208Z M600 200C597 240 570 290 520 360C470 430 430 490 430 548C430 590 460 618 498 618C535 618 565 590 590 563C620 530 640 505 660 490C685 472 705 468 716 471L690 445C672 428 650 428 625 450C595 482 560 525 525 548C500 566 478 566 468 560C458 550 457 535 459 520C465 480 490 435 520 385C560 320 590 270 605 208Z";
+document.getElementById('lg').setAttribute('d',LOGO);
+const T={
+book:['Reservar','Book'],internal:['Interno','Internal'],s1:['Categoría','Category'],s2:['Servicio','Service'],s3:['Fecha y hora','Date & time'],s4:['Tus datos','Your details'],s5:['Consulta','Consultation'],s6:['Pago','Payment'],
+step:['Paso','Step'],of:['de','of'],back:['Atrás','Back'],cont:['Continuar','Continue'],from:['Desde','From'],
+h0:['Reserva tu próxima visita','Book your next visit'],l0:['Elige un servicio, escoge tu horario y paga tu depósito en pocos minutos.','Choose a service, pick a time and pay your deposit in a few minutes.'],
+start:['Reservar mi cita','Book my appointment'],w1:['Hola,','Hi there,'],w2:['¿cuándo te vemos?','when shall we see you?'],wl:['Reserva en un par de minutos. Sin crear cuenta ni recordar contraseñas.','Book in a couple of minutes. No account or password needed.'],p1:['Elige tu servicio','Choose your service'],p1b:['Con duración y precio a la vista','Duration and price up front'],p2:['Escoge tu horario','Pick your time'],p2b:['Solo ves los espacios disponibles','You only see open slots'],p3:['Confirma con un depósito','Confirm with a deposit'],p3b:['Y te lo recordamos un día antes','And we remind you the day before'],wn:['Cambios gratis hasta 48 horas antes de tu cita.','Free changes up to 48 hours before your appointment.'],
+h1:['¿Qué quieres reservar?','What are you booking?'],l1:['Elige una categoría.','Choose a category.'],c1:['Corte','Cut'],c2:['Color','Color'],svcs:['servicios','services'],
+h2:['Elige un servicio','Choose a service'],l2:['Revisa la duración, el precio y los requisitos.','Review duration, price and requirements.'],go3:['Elegir fecha y hora','Choose date & time'],cr:['Requiere consulta','Consultation required'],rq:['Requisitos:','Requirements:'],
+h3:['Elige fecha y hora','Pick a date and time'],l3:['Horarios disponibles para {m} minutos.','Slots available for {m} minutes.'],pick:['Selecciona una fecha para ver los horarios.','Select a date to see available times.'],un:['Los horarios tachados no están disponibles.','Crossed-out times are unavailable.'],
+h4:['Tus datos','Your details'],l4:['Solo pedimos lo necesario para este servicio.','We only ask what we need for this service.'],nm:['Nombre completo','Full name'],ph:['Teléfono','Phone'],em:['Correo electrónico','Email'],no:['Notas (opcional)','Notes (optional)'],e1:['Escribe tu nombre.','Enter your name.'],e2:['Escribe un teléfono válido.','Enter a valid phone number.'],e3:['Escribe un correo válido.','Enter a valid email address.'],
+h5:['Consulta de color','Color consultation'],l5:['Ayuda a tu especialista a evaluar tu solicitud antes de la cita.','Help your specialist evaluate your request before the appointment.'],q1:['Historial del cabello (color, decoloración, tratamientos)','Hair history (color, bleach, treatments)'],q2:['Estado actual','Current condition'],q3:['¿Qué resultado buscas?','What result do you want?'],q4:['¿Tienes fotos de referencia?','Do you have reference photos?'],yes:['Sí','Yes'],nop:['No','No'],
+n5:['Tu especialista revisará esto y podría sugerir otro servicio, duración o precio. Nunca se garantiza un resultado específico.','Your specialist reviews this and may suggest a different service, duration or price. A specific result is never guaranteed.'],gopay:['Continuar al pago','Continue to payment'],
+h6:['Revisa y paga','Review and pay'],l6:['Verifica el monto y las políticas antes de enviar.','Check the amount and policy before you submit.'],when:['Cuándo','When'],dur:['Duración','Duration'],chg:['puede cambiar','may change'],
+n6:['<b>Antes de pagar:</b> esta cita es una consulta y evaluación. El servicio final, la duración y el precio pueden cambiar tras el diagnóstico. Si tu solicitud no es viable, solo pagas lo que se realice, por ejemplo consulta + secado.','<b>Before you pay:</b> this visit is a consultation and evaluation. The final service, duration and price may change after diagnosis. If your request isn\'t viable, you\'re charged only for what is performed, for example consultation + blow-dry.'],
+dep:['Depósito','Deposit'],full:['Pago completo','Pay in full'],due:['A pagar hoy','Due today'],agree:['He leído las políticas','I\'ve read the policies'],agree2:[' y entiendo que el servicio y el precio final se definen tras la consulta',' and understand the final service and price are set after consultation'],pay:['Pagar','Pay'],book2:['y reservar','and book'],
+h7:['Solicitud recibida','Request received'],ref:['Referencia','Reference'],l7:['Nuestro equipo está revisando tu reserva. Recibirás la confirmación por correo y mensaje.','Our team is reviewing your booking. You\'ll get a confirmation by email and text.'],paid:['Pagado','Paid'],next:['Qué sigue','What happens next'],
+t1:['Reserva enviada','Booking submitted'],t2:['Revisión del equipo','Team review'],t2b:[' y aprobación de la especialista',' and specialist approval'],t3:['Confirmación enviada','Confirmation sent'],t4:['Recordatorio un día antes','Reminder one day before'],t5:['Tu cita','Your appointment'],seeq:['Ver en la cola interna','See it in the internal queue'],another:['Reservar otra','Book another'],
+qt:['Cola de reservas','Booking queue'],all:['Todas','All'],pending:['Pendiente de revisión','Pending review'],payp:['Pago pendiente','Payment pending'],conf:['Confirmada','Confirmed'],rem:['Recordatorio enviado','Reminder sent'],done:['Completada','Completed'],res:['Reprogramación solicitada','Reschedule requested'],can:['Cancelada','Cancelled'],
+cl:['Cliente','Client'],sv:['Servicio','Service'],st:['Estado','Status'],cs:['Consulta','Consultation'],none:['No hay reservas con este estado.','No bookings with this status.'],dt:['Detalle de reserva','Booking detail'],dn:['Selecciona una reserva para revisarla y elegir la siguiente acción.','Select a booking to review it and choose the next action.'],
+pa:['Pago','Payment'],tot:['Total','Total'],sp:['Especialista','Specialist'],ca:['Respuestas de consulta','Consultation answers'],hi:['Historial','History'],co:['Estado','Condition'],go:['Objetivo','Goal'],
+ni:['Se requiere aprobación de la especialista para confirmar. El servicio, la duración y el precio finales pueden cambiar.','Specialist approval is required to confirm. Final service, duration and price may change.'],
+a1:['Confirmar','Confirm'],a2:['Cambiar horario','Change slot'],a3:['Enviar recordatorio','Send reminder'],a4:['Marcar completada','Mark completed'],a5:['Cancelar','Cancel'],au:['Registro de actividad','Audit log'],
+aSub:['Reserva enviada','Booking submitted'],aPaid:['Pago recibido: $','Payment received: $'],aConf:['Confirmada por el PM','Confirmed by PM'],aRes:['Reprogramación solicitada','Reschedule requested'],aRem:['Recordatorio de un día enviado','One-day reminder sent'],aDone:['Cita completada','Appointment completed'],aCan:['Cancelada; reembolso según la política','Cancelled; refund per policy'],aReq:['La clienta pidió un nuevo horario','Client requested a new slot'],
+unp:['Sin pagar','Not paid'],dpd:['Depósito pagado','Deposit paid'],fpd:['Pagado completo','Paid in full'],tom:['Mañana','Tomorrow'],fri:['Viernes','Friday']};
+const lang0=(()=>{try{return localStorage.getItem('lg')}catch(e){}})();
+let lang=lang0||'es';
+const LI=()=>lang==='es'?0:1;
+const t=k=>(Array.isArray(k)?k:T[k])[LI()];
+const tx=v=>Array.isArray(v)?v[LI()]:v;
+const SV=[
+{id:1,cat:'Corte',n:['Corte firma','Signature cut'],d:['Consulta, lavado, corte de precisión y acabado.','Consultation, wash, precision cut and finish.'],min:60,price:55,pt:'fixed',cons:false,req:['Llega con el cabello limpio y seco si es posible.','Come with clean, dry hair if possible.']},
+{id:2,cat:'Corte',n:['Corte + secado','Cut + blow-dry'],d:['Nuestro corte firma con secado y peinado completo.','Our signature cut with a full styled blow-dry.'],min:75,price:70,pt:'fixed',cons:false,req:['Ninguno.','None.']},
+{id:3,cat:'Color',n:['Primera cita de color','First color appointment'],d:['Consulta + evaluación. Revisamos tu historial y tus objetivos, y tu especialista recomienda el servicio, la duración y el precio final.','Consultation + evaluation. We review your hair history and goals, then your specialist recommends the service, duration and final price.'],min:90,price:60,pt:'from',cons:true,req:['Trae fotos de referencia y recuerda cuándo fue tu último color.','Bring reference photos and know your last color date.']},
+{id:4,cat:'Color',n:['Retoque de raíz','Root touch-up'],d:['Para clientas de color con fórmula registrada.','For returning color clients with a formula on file.'],min:120,price:95,pt:'from',cons:false,req:['Disponible tras completar la primera cita de color.','Available after a completed first color appointment.']}];
+const POL=[[['Depósito','Deposit'],['El depósito asegura tu cupo y se descuenta del total final.','A deposit secures your slot and is deducted from your final total.']],[['Cancelación y cambios','Cancellation & changes'],['Cambios gratis hasta 48 horas antes. Después, podrías perder el depósito.','Free changes up to 48 hours before. Later changes may forfeit the deposit.']],[['Inasistencia y llegadas tarde','No-show & late arrival'],['Si no asistes, pierdes el depósito. Con más de 15 minutos de retraso, el servicio puede acortarse o reprogramarse.','No-shows forfeit the deposit. After 15 minutes late, the service may be shortened or rescheduled.']],[['Reembolsos','Refunds'],['Reembolsamos el depósito si cancelamos nosotros. En color se cobra solo lo realizado.','Deposits are refunded if we cancel. Color services are charged only for what is performed.']]];
+const CONDS=[['Selecciona…','Select…'],['Saludable','Healthy'],['Seco o dañado','Dry or damaged'],['Previamente decolorado','Previously bleached'],['Natural, nunca teñido','Natural, never colored']];
+const SLOTS=['9:00','10:30','12:00','13:30','15:00','16:30'];
+const IL={
+cut:'<svg viewBox="0 0 48 48"><path class="s" d="M12 6L32 32"/><circle class="s" cx="35" cy="37" r="5"/><path class="s" d="M36 6L16 32"/><circle class="s" cx="13" cy="37" r="5"/><circle class="f" cx="24" cy="21.6" r="2.4"/></svg>',
+blow:'<svg viewBox="0 0 48 48"><path class="s" d="M6 14h22a8 8 0 010 16H6z"/><path class="s" d="M16 30l-2 12h9l-1-12"/><path class="s" d="M36 16c3 0 5 2 8 2M36 22h9M36 28c3 0 5-2 8-2"/><circle class="f" cx="12" cy="22" r="2.4"/></svg>',
+color:'<svg viewBox="0 0 48 48"><path class="s" d="M6 26h32c0 8-6 14-16 14S6 34 6 26z"/><path class="s" d="M26 22L41 6"/><path class="f" d="M23 25l4-4 3 3-4 4z"/><circle class="f" cx="14" cy="32" r="2.4"/></svg>',
+root:'<svg viewBox="0 0 48 48"><path class="s" d="M15 36C11 26 15 16 19 8M24 36V8M33 36C37 26 33 16 29 8"/><rect class="f" x="10" y="36" width="28" height="5" rx="2.5"/></svg>'};
+const IC={1:'cut',2:'blow',3:'color',4:'root'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let view='c',st=fresh(),sel=null,flt='all',an=true,flash=null;
+function fresh(){return{step:0,cat:null,svc:null,date:null,time:null,info:{name:'',phone:'',email:'',notes:''},touched:false,cons:{hist:'',cond:0,goal:'',refs:'y'},pay:'deposit',agree:false,ref:null}}
+const days=[...Array(8)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i+1);return d});
+const loc=()=>lang==='es'?'es-DO':'en-US';
+const dl=d=>d.toLocaleDateString(loc(),{weekday:'short',month:'short',day:'numeric'});
+const unavailable=(di,si)=>(di*7+si*3)%5===0;
+const money=n=>'$'+n,dep=s=>Math.round(s.price*.3/5)*5,P=s=>(s.pt==='from'?t('from')+' ':'')+money(s.price);
+const SC={pending:'b-pending',payp:'b-pay',conf:'b-conf',rem:'b-rem',done:'b-done',res:'b-res',can:'b-can'};
+const badge=k=>`<span class="badge ${SC[k]}">${t(k)}</span>`;
+const SVn=id=>SV.find(x=>x.id===id);
+let Q=[
+{id:'B-1042',name:'Camila Reyes',svc:3,wk:'tom',time:'10:30',status:'pending',pay:{k:'dpd',v:30},total:60,cons:true,spec:['Líder de Corte y Color','Corte & Color Lead'],hist:['Tinte de caja hace 6 meses, puntas decoloradas','Box dye 6 months ago, bleached ends'],cond:CONDS[2],goal:['Balayage caramelo claro','Light caramel balayage'],audit:[['aSub'],['aPaid',30]]},
+{id:'B-1041',name:'Lucía Fernández',svc:2,wk:'tom',time:'13:30',status:'conf',pay:{k:'dpd',v:20},total:70,cons:false,spec:'—',audit:[['aSub'],['aPaid',20],['aConf']]},
+{id:'B-1040',name:'Andrea Peña',svc:1,wk:'fri',time:'9:00',status:'payp',pay:{k:'unp'},total:55,cons:false,spec:'—',audit:[['aSub']]},
+{id:'B-1039',name:'Marta Soto',svc:4,wk:'fri',time:'15:00',status:'res',pay:{k:'dpd',v:30},total:95,cons:false,spec:'—',audit:[['aSub'],['aConf'],['aReq']]}];
+const wh=b=>(b.date?dl(b.date):t(b.wk))+' · '+b.time;
+const payT=p=>p.k==='unp'?t('unp'):t(p.k)+` ($${p.v})`;
+
+function render(){
+  document.documentElement.lang=lang;
+  $('#le').setAttribute('aria-pressed',lang==='es');$('#ln').setAttribute('aria-pressed',lang==='en');
+  $('#vc').textContent=t('book');$('#vi').textContent=t('internal');
+  $('#vc').setAttribute('aria-pressed',view==='c');$('#vi').setAttribute('aria-pressed',view==='i');
+  $('#app').innerHTML=view==='c'?client():internal();
+  if(an)window.scrollTo(0,0);
+  an=false;
+}
+function go(n){st.step=n;an=true;render()}
+function next(){let n=st.step+1;if(n===5&&!st.svc.cons)n=6;go(n)}
+function prev(){let n=st.step-1;if(n===5&&!st.svc.cons)n=4;go(Math.max(0,n))}
+const okP=()=>/^[\d\s+()-]{7,}$/.test(st.info.phone),okE=()=>/\S+@\S+\.\S+/.test(st.info.email);
+function valid(){return st.info.name.trim()&&okP()&&okE()}
+
+function client(){
+  const s=st.svc,S=st.step,i=st.info,tc=st.touched;if(S===0)return welcome();
+  let h='',f='';
+  if(S===1){
+    h=`<h2>${t('h1')}</h2><p class="lead">${t('l1')}</p><div class="cats">`+['Corte','Color'].map(c=>`<button class="opt cat" aria-pressed="${st.cat===c}" onclick="st.cat='${c}';st.svc=null;go(2)"><span class="ic">${IL[c==='Corte'?'cut':'color']}</span><span class="tx"><h3>${t(c==='Corte'?'c1':'c2')}</h3><div class="meta">${SV.filter(x=>x.cat===c).length} ${t('svcs')}</div></span></button>`).join('')+`</div>`;
+  }else if(S===2){
+    h=`<h2>${t('h2')}</h2><p class="lead">${t('l2')}</p>`+SV.filter(x=>x.cat===st.cat).map(x=>`<button class="opt" aria-pressed="${s?.id===x.id}" onclick="st.svc=SV.find(v=>v.id==${x.id});render()"><span class="ic">${IL[IC[x.id]]}</span><span class="tx"><h3>${t(x.n)}</h3><div>${t(x.d)}</div><div class="meta"><span>${x.min} min</span><span>${P(x)}</span></div>${x.cons?`<span class="tag">${t('cr')}</span>`:''}${s?.id===x.id?`<div class="meta" style="margin-top:10px">${t('rq')} ${t(x.req)}</div>`:''}</span></button>`).join('');
+    f=`<button class="btn" ${s?'':'disabled'} onclick="next()">${t('go3')}</button>`;
+  }else if(S===3){
+    h=`<h2>${t('h3')}</h2><p class="lead">${t('l3').replace('{m}',s.min)}</p><div class="days">`+days.map((d,k)=>`<button class="day" aria-pressed="${st.date===k}" onclick="st.date=${k};st.time=null;render()"><span>${d.toLocaleDateString(loc(),{weekday:'short'})}</span><b>${d.getDate()}</b><span>${d.toLocaleDateString(loc(),{month:'short'})}</span></button>`).join('')+`</div>`;
+    h+=st.date===null?`<p class="lead">${t('pick')}</p>`:`<div class="slots">`+SLOTS.map((x,j)=>`<button class="slot" ${unavailable(st.date,j)?'disabled':''} aria-pressed="${st.time===x}" onclick="st.time='${x}';render()">${x}</button>`).join('')+`</div><p class="lead" style="margin:14px auto 0;font-size:13px">${t('un')}</p>`;
+    f=`<button class="btn" ${st.time?'':'disabled'} onclick="next()">${t('cont')}</button>`;
+  }else if(S===4){
+    h=`<h2>${t('h4')}</h2><p class="lead">${t('l4')}</p><div class="fld">
+    <label for="n">${t('nm')}</label><input id="n" class="${tc&&!i.name.trim()?'invalid':''}" value="${esc(i.name)}" oninput="st.info.name=this.value" autocomplete="name">${tc&&!i.name.trim()?`<div class="errmsg">${t('e1')}</div>`:''}
+    <label for="p">${t('ph')}</label><input id="p" type="tel" class="${tc&&!okP()?'invalid':''}" value="${esc(i.phone)}" oninput="st.info.phone=this.value" autocomplete="tel">${tc&&!okP()?`<div class="errmsg">${t('e2')}</div>`:''}
+    <label for="e">${t('em')}</label><input id="e" type="email" class="${tc&&!okE()?'invalid':''}" value="${esc(i.email)}" oninput="st.info.email=this.value" autocomplete="email">${tc&&!okE()?`<div class="errmsg">${t('e3')}</div>`:''}
+    <label for="o">${t('no')}</label><textarea id="o" rows="2" oninput="st.info.notes=this.value">${esc(i.notes)}</textarea></div>`;
+    f=`<button class="btn" onclick="if(valid()){next()}else{st.touched=true;render()}">${t('cont')}</button>`;
+  }else if(S===5){
+    const c=st.cons;
+    h=`<h2>${t('h5')}</h2><p class="lead">${t('l5')}</p><div class="fld">
+    <label for="h">${t('q1')}</label><textarea id="h" rows="2" oninput="st.cons.hist=this.value;chk()">${esc(c.hist)}</textarea>
+    <label for="c">${t('q2')}</label><select id="c" onchange="st.cons.cond=this.selectedIndex;chk()">${CONDS.map((o,k)=>`<option ${c.cond===k?'selected':''}>${o[LI()]}</option>`).join('')}</select>
+    <label for="g">${t('q3')}</label><textarea id="g" rows="2" oninput="st.cons.goal=this.value;chk()">${esc(c.goal)}</textarea>
+    <label>${t('q4')}</label><div class="chips">${[['y','yes'],['n','nop']].map(o=>`<button class="chip" aria-pressed="${c.refs===o[0]}" onclick="st.cons.refs='${o[0]}';render()">${t(o[1])}</button>`).join('')}</div></div>
+    <div class="notice">${t('n5')}</div>`;
+    f=`<button class="btn" id="cb" ${c.hist.trim()&&c.cond>0&&c.goal.trim()?'':'disabled'} onclick="next()">${t('gopay')}</button>`;
+  }else if(S===6){
+    const d=dep(s),amt=st.pay==='deposit'?d:s.price;
+    h=`<h2>${t('h6')}</h2><p class="lead">${t('l6')}</p>
+    <div class="sum"><div class="row"><span>${t(s.n)}</span><span>${P(s)}</span></div><div class="row"><span>${t('when')}</span><span>${dl(days[st.date])}, ${st.time}</span></div><div class="row"><span>${t('dur')}</span><span>${s.min} min${s.cons?` (${t('chg')})`:''}</span></div></div>
+    ${s.cons?`<div class="notice">${t('n6')}</div>`:''}
+    <div class="chips"><button class="chip" aria-pressed="${st.pay==='deposit'}" onclick="st.pay='deposit';render()">${t('dep')} ${money(d)}</button><button class="chip" aria-pressed="${st.pay==='full'}" onclick="st.pay='full';render()">${t('full')}</button></div>
+    <div class="sum"><div class="row tot"><span>${t('due')}</span><span>${money(amt)}</span></div></div>
+    ${POL.map(p=>`<details><summary>${t(p[0])}</summary><p>${t(p[1])}</p></details>`).join('')}
+    <label class="check"><input type="checkbox" ${st.agree?'checked':''} onchange="st.agree=this.checked;document.getElementById('pb').disabled=!this.checked"><span>${t('agree')}${s.cons?t('agree2'):''}.</span></label>`;
+    f=`<button class="btn" id="pb" ${st.agree?'':'disabled'} onclick="submit()">${t('pay')} ${money(amt)} ${t('book2')}</button>`;
+  }else{
+    h=`<h2>${t('h7')}</h2><p class="lead">${t('ref')} ${st.ref}. ${t('l7')}</p>
+    <div class="sum"><div class="row"><span>${t('s2')}</span><span>${t(s.n)}</span></div><div class="row"><span>${t('when')}</span><span>${dl(days[st.date])}, ${st.time}</span></div><div class="row"><span>${t('paid')}</span><span>${money(st.pay==='deposit'?dep(s):s.price)}</span></div></div>
+    <h3 style="font-size:22px;margin-top:26px">${t('next')}</h3><ul class="tl"><li class="done">${t('t1')}</li><li>${t('t2')}${s.cons?t('t2b'):''}</li><li>${t('t3')}</li><li>${t('t4')}</li><li>${t('t5')}</li></ul>`;
+    f=`<button class="btn ghost" onclick="view='i';sel='${st.ref}';flash='${st.ref}';an=true;render()">${t('seeq')}</button><button class="btn ghost" onclick="st=fresh();an=true;render()">${t('another')}</button>`;
+  }
+  const ids=[1,2,3,4,5,6].filter(k=>k!==5||(s&&s.cons));
+  const stp=ids.map(k=>`<i class="${k<S||S===7?'on':''} ${k===S?'cur':''}"></i>`).join('');
+  const lab=S>0&&S<7?`${t('step')} ${ids.indexOf(S)+1} ${t('of')} ${ids.length} · ${t('s'+S)}`:'';
+  const pill=s&&S>=3&&S<7?`<span class="pill"><b>${t(s.n)}</b> ${s.min} min · ${P(s)}${st.time?' · '+dl(days[st.date])+', '+st.time:''}</span>`:'';
+  return `<div class="stage ${an?'an':''}"><div class="steps">${stp}</div><div class="nav">${S>0&&S<7?`<button class="back" onclick="prev()">${t('back')}</button>`:'<span></span>'}<span>${lab}</span><span></span></div>${pill}<div class="body">${h}</div>${f?`<div class="foot">${f}</div>`:''}</div>`;
+}
+function welcome(){
+  const it=[['p1','p1b'],['p2','p2b'],['p3','p3b']].map((k,n)=>`<li><b>${n+1}</b><span class="pt">${t(k[0])}</span><span>${t(k[1])}</span></li>`).join('');
+  return `<div class="stage wl ${an?'an':''}"><div class="wl-main"><div class="by"><b>Corte &amp; Color</b> by Salon Avatar</div><h1 class="wh"><span><i>${t('w1')}</i></span><span><i>${t('w2')}</i></span></h1><p class="lead">${t('wl')}</p><ol class="proc">${it}</ol></div><div class="foot"><button class="btn" onclick="go(1)">${t('start')}</button><p class="fine">${t('wn')}</p></div></div>`;
+}
+function chk(){const c=st.cons,b=$('#cb');if(b)b.disabled=!(c.hist.trim()&&c.cond>0&&c.goal.trim())}
+function submit(){
+  const s=st.svc,paid=st.pay==='deposit'?dep(s):s.price;
+  st.ref='B-'+(1043+Q.length-4);
+  Q.unshift({id:st.ref,name:st.info.name,svc:s.id,date:days[st.date],time:st.time,status:'pending',pay:{k:st.pay==='deposit'?'dpd':'fpd',v:paid},total:s.price,cons:s.cons,spec:s.cons?['Líder de Corte y Color','Corte & Color Lead']:'—',hist:st.cons.hist,cond:CONDS[st.cons.cond],goal:st.cons.goal,audit:[['aSub'],['aPaid',paid]]});
+  go(7);
+}
+function internal(){
+  const names=['all','pending','payp','conf','res','done','can'];
+  const L=Q.filter(b=>flt==='all'||b.status===flt),b=Q.find(x=>x.id===sel);
+  return `<div class="ops ${an?'an':''}"><section class="panel"><h2>${t('qt')}</h2>
+  <div class="filters">${names.map(n=>`<button class="chip" aria-pressed="${flt===n}" onclick="flt='${n}';render()">${t(n)} ${n==='all'?Q.length:Q.filter(x=>x.status===n).length}</button>`).join('')}</div>
+  <div class="scroll">${L.length?`<table><thead><tr><th>${t('cl')}</th><th>${t('sv')}</th><th>${t('when')}</th><th>${t('st')}</th></tr></thead><tbody>${L.map(x=>`<tr class="r ${x.id===sel?'sel':''} ${x.id===flash?'flash':''}" tabindex="0" onclick="sel='${x.id}';render()" onkeydown="if(event.key==='Enter'){sel='${x.id}';render()}"><td><b style="font-weight:500">${esc(x.name)}</b><br><span style="color:var(--mut);font-size:13px">${x.id}</span></td><td>${t(SVn(x.svc).n)}${x.cons?`<br><span class="tag">${t('cs')}</span>`:''}</td><td>${wh(x)}</td><td>${badge(x.status)}</td></tr>`).join('')}</tbody></table>`:`<div class="empty">${t('none')}</div>`}</div></section>
+  <section class="panel">${b?detail(b):`<h2>${t('dt')}</h2><div class="empty">${t('dn')}</div>`}</section></div>`;
+}
+function detail(b){
+  return `<h2>${esc(b.name)}</h2><div style="margin-bottom:12px">${badge(b.status)}</div>
+  <div class="sum"><div class="row"><span>${t('sv')}</span><span>${t(SVn(b.svc).n)}</span></div><div class="row"><span>${t('when')}</span><span>${wh(b)}</span></div><div class="row"><span>${t('pa')}</span><span>${payT(b.pay)}</span></div><div class="row"><span>${t('tot')}</span><span>${b.cons?t('from')+' ':''}${money(b.total)}</span></div><div class="row"><span>${t('sp')}</span><span>${tx(b.spec)}</span></div></div>
+  ${b.cons?`<h3 style="font-size:20px;margin-top:20px">${t('ca')}</h3><div class="sum"><div class="row"><span>${t('hi')}</span><span>${esc(tx(b.hist))}</span></div><div class="row"><span>${t('co')}</span><span>${tx(b.cond)}</span></div><div class="row"><span>${t('go')}</span><span>${esc(tx(b.goal))}</span></div></div><div class="notice">${t('ni')}</div>`:''}
+  <div class="act"><button class="p" onclick="setS('${b.id}','conf','aConf')">${t('a1')}</button><button onclick="setS('${b.id}','res','aRes')">${t('a2')}</button><button onclick="setS('${b.id}','rem','aRem')">${t('a3')}</button><button onclick="setS('${b.id}','done','aDone')">${t('a4')}</button><button class="d" onclick="setS('${b.id}','can','aCan')">${t('a5')}</button></div>
+  <h3 style="font-size:20px;margin-top:24px">${t('au')}</h3><ul class="audit">${b.audit.map(a=>`<li>${t(a[0])}${a[1]||''}</li>`).join('')}</ul>`;
+}
+function setS(id,s,a){const b=Q.find(x=>x.id===id);b.status=s;b.audit.push([a]);render()}
+function setLang(l){lang=l;try{localStorage.setItem('lg',l)}catch(e){}render()}
+$('#le').onclick=()=>setLang('es');$('#ln').onclick=()=>setLang('en');
+$('#vc').onclick=()=>{view='c';an=true;render()};$('#vi').onclick=()=>{view='i';an=true;render()};
+render();
+</script>
+</body>
+</html>
